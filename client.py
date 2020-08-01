@@ -3,6 +3,7 @@ import socket
 import cmd
 import threading
 
+# Ben: See rant in server.py about globals. Remove globals.
 current_connection = None
 
 #TODO so much left to fucking do to make this thing usable by real humans but it technically works
@@ -11,16 +12,21 @@ class ClientConnection(threading.Thread):
         global current_connection
         threading.Thread.__init__(self)
         self.clientsocket = socket.socket()
+        # Don't hardcode addresses and ports. Get them from the user
+        # using cmd line parameters, user input, or configuration files.
+        # These parameters should go after the openconnection command
         self.clientsocket.connect(("127.0.0.1", 12345))
         current_connection = self
 
     def run(self):
         while True:
+            # Ben: See comment in server.py about framing data
             data = self.clientsocket.recv(64)
             data = data.decode("utf-8")
             print("\nRECIEVED: {}\n".format(data))
 
     def send(self, message):
+        # Ben: See comment in server.py about framing data
         self.clientsocket.send(message.encode('utf-8'))
 
     def close_connection(self):
